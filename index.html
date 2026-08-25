@@ -11,88 +11,95 @@
             box-sizing: border-box;
         }
 
+        html,
         body {
+            width: 100%;
+            height: 100%;
             margin: 0;
-            background: #000;
-            color: #00ff41;
+        }
+
+        body {
+            background: #000000;
+            color: #00ffbb;
             font-family: "Courier New", monospace;
             overflow: hidden;
         }
 
         #terminal {
-            padding: 35px;
-            font-size: 20px;
-            line-height: 1.6;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+            width: 90%;
+            max-width: 1100px;
+
+            font-size: 24px;
+            line-height: 1.7;
+
             text-shadow:
-                0 0 5px #00ff41,
-                0 0 10px #00ff41;
+                0 0 5px #00ffbb,
+                0 0 10px #00ffbb;
         }
 
+        #text {
+            white-space: pre-wrap;
+        }
+
+        /* Son mesajdaki imleç */
         #cursor {
-            display: inline-block;
-            width: 10px;
-            height: 22px;
-            background: #00ff41;
+            display: none;
+
+            width: 13px;
+            height: 25px;
+
+            background: #00ffbb;
+
+            margin-left: 4px;
+
+            vertical-align: middle;
+
             animation: blink 0.7s infinite;
         }
 
         @keyframes blink {
-            50% {
+            0%, 49% {
+                opacity: 1;
+            }
+
+            50%, 100% {
                 opacity: 0;
             }
         }
 
-        #passwordScreen {
+        /* Şifre alanı */
+        #passwordArea {
             display: none;
-            position: fixed;
-            inset: 0;
-            background: #000;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-
-        #passwordScreen h1 {
-            font-size: 24px;
-            font-weight: normal;
-            margin-bottom: 30px;
+            margin-top: 15px;
         }
 
         #password {
             background: transparent;
             border: none;
-            border-bottom: 1px solid #00ff41;
             outline: none;
-            color: #00ff41;
+
+            color: #00ffbb;
+
             font-family: "Courier New", monospace;
-            font-size: 20px;
-            text-align: center;
-            padding: 10px;
-            width: 280px;
+            font-size: 24px;
+
+            width: 300px;
+
+            caret-color: #00ffbb;
+
+            text-shadow:
+                0 0 5px #00ffbb,
+                0 0 10px #00ffbb;
         }
 
-        #password::placeholder {
-            color: #075d1d;
-        }
-
-        #enter {
-            margin-top: 20px;
-            background: transparent;
-            color: #00ff41;
-            border: 1px solid #00ff41;
-            padding: 8px 25px;
-            font-family: "Courier New", monospace;
-            cursor: pointer;
-        }
-
-        #enter:hover {
-            background: #00ff41;
-            color: #000;
-        }
-
-        #wrong {
-            margin-top: 20px;
-            height: 20px;
+        #password::selection {
+            background: #00ffbb;
+            color: #000000;
         }
     </style>
 </head>
@@ -100,105 +107,146 @@
 <body>
 
     <div id="terminal">
-        <span id="text"></span><span id="cursor"></span>
-    </div>
 
-    <div id="passwordScreen">
+        <span id="text"></span>
+        <span id="cursor"></span>
 
-        <h1>ŞİFRE GEREKLİ</h1>
-
-        <input
-            id="password"
-            type="password"
-            placeholder="..."
-        >
-
-        <button id="enter">GİR</button>
-
-        <div id="wrong"></div>
+        <div id="passwordArea">
+            <input
+                id="password"
+                type="password"
+                autocomplete="off"
+                spellcheck="false"
+            >
+        </div>
 
     </div>
+
 
     <script>
 
-        const lines = [
-            "> CONNECTION ESTABLISHED",
-            "> SEARCHING...",
-            "> USER FOUND",
-            "",
-            "> HOŞGELDİN NEO"
-        ];
-
         const text = document.getElementById("text");
         const cursor = document.getElementById("cursor");
-        const terminal = document.getElementById("terminal");
-        const passwordScreen = document.getElementById("passwordScreen");
 
-        let line = 0;
-        let character = 0;
+        const passwordArea = document.getElementById("passwordArea");
+        const password = document.getElementById("password");
 
-        function typeWriter() {
 
-            if (line >= lines.length) {
+        const messages = [
+            "Hoşgeldin Neo...",
+            "Ben de seni bekliyordum.",
+            "Devam etmek için şifreyi girmelisin..."
+        ];
 
-                setTimeout(() => {
 
-                    terminal.style.display = "none";
-                    passwordScreen.style.display = "flex";
+        let messageIndex = 0;
+        let characterIndex = 0;
 
-                }, 1800);
 
-                return;
+        function typeMessage() {
+
+            const currentMessage = messages[messageIndex];
+
+
+            /* Mesaj tamamen yazılmadıysa */
+            if (characterIndex < currentMessage.length) {
+
+                text.textContent += currentMessage[characterIndex];
+
+                characterIndex++;
+
+                setTimeout(typeMessage, 120);
+
             }
 
-            if (character < lines[line].length) {
 
-                text.textContent += lines[line].charAt(character);
+            /* Mesaj tamamen yazıldı */
+            else {
 
-                character++;
+                /* Son mesajsa */
+                if (messageIndex === messages.length - 1) {
 
-                setTimeout(typeWriter, 70);
+                    setTimeout(() => {
 
-            } else {
+                        cursor.style.display = "inline-block";
 
-                text.textContent += "\n";
+                        passwordArea.style.display = "block";
 
-                line++;
-                character = 0;
+                        password.focus();
 
-                setTimeout(typeWriter, 500);
+                    }, 300);
+
+                }
+
+
+                /* İlk veya ikinci mesajsa */
+                else {
+
+                    setTimeout(() => {
+
+                        deleteMessage();
+
+                    }, 3000);
+
+                }
+
             }
         }
 
-        setTimeout(typeWriter, 1000);
 
+        function deleteMessage() {
 
-        const passwordInput = document.getElementById("password");
-        const enterButton = document.getElementById("enter");
-        const wrong = document.getElementById("wrong");
+            if (characterIndex > 0) {
 
-        function checkPassword() {
+                text.textContent =
+                    text.textContent.slice(0, -1);
 
-            const password = passwordInput.value;
+                characterIndex--;
 
-            if (password === "37") {
+                setTimeout(deleteMessage, 45);
 
-                wrong.textContent = "ACCESS GRANTED";
+            }
 
-            } else {
+            else {
 
-                wrong.textContent = "ACCESS DENIED";
-                passwordInput.value = "";
+                messageIndex++;
+
+                setTimeout(typeMessage, 500);
 
             }
         }
 
-        enterButton.addEventListener("click", checkPassword);
 
-        passwordInput.addEventListener("keydown", function(event) {
+        /* Site açıldıktan sonra biraz bekle */
+        setTimeout(typeMessage, 1000);
+
+
+        /*
+            Şimdilik test şifresi.
+            Daha sonra bunu defterde çözülen gerçek
+            şifreyle değiştireceğiz.
+        */
+
+        password.addEventListener("keydown", function(event) {
 
             if (event.key === "Enter") {
-                checkPassword();
+
+                const enteredPassword = password.value;
+
+                if (enteredPassword === "37") {
+
+                    console.log("ACCESS GRANTED");
+
+                }
+
+                else {
+
+                    console.log("ACCESS DENIED");
+
+                    password.value = "";
+
+                }
+
             }
 
         });
