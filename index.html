@@ -25,17 +25,23 @@
             overflow: hidden;
         }
 
+        /* TERMINAL YAZISI */
+
         #terminal {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
 
-            width: 90%;
-            max-width: 1100px;
+            top: 30px;
+            left: 35px;
 
+            width: calc(100% - 70px);
+
+            text-align: left;
+
+            font-family: "Courier New", monospace;
             font-size: 24px;
             line-height: 1.7;
+
+            color: #00ffbb;
 
             text-shadow:
                 0 0 5px #00ffbb,
@@ -46,7 +52,9 @@
             white-space: pre-wrap;
         }
 
-        /* Son mesajdaki imleç */
+
+        /* YANIP SÖNEN İMLEÇ */
+
         #cursor {
             display: none;
 
@@ -63,29 +71,38 @@
         }
 
         @keyframes blink {
-            0%, 49% {
+
+            0%,
+            49% {
                 opacity: 1;
             }
 
-            50%, 100% {
+            50%,
+            100% {
                 opacity: 0;
             }
+
         }
 
-        /* Şifre alanı */
+
+        /* ŞİFRE ALANI */
+
         #passwordArea {
             display: none;
-            margin-top: 15px;
+
+            margin-top: 10px;
         }
 
         #password {
             background: transparent;
+
             border: none;
             outline: none;
 
             color: #00ffbb;
 
             font-family: "Courier New", monospace;
+
             font-size: 24px;
 
             width: 300px;
@@ -101,10 +118,15 @@
             background: #00ffbb;
             color: #000000;
         }
+
     </style>
 </head>
 
+
 <body>
+
+
+    <!-- TERMINAL -->
 
     <div id="terminal">
 
@@ -112,146 +134,290 @@
         <span id="cursor"></span>
 
         <div id="passwordArea">
+
             <input
                 id="password"
                 type="password"
                 autocomplete="off"
                 spellcheck="false"
             >
+
         </div>
 
     </div>
 
 
+
     <script>
 
-        const text = document.getElementById("text");
-        const cursor = document.getElementById("cursor");
-
-        const passwordArea = document.getElementById("passwordArea");
-        const password = document.getElementById("password");
-
+        /*
+        ==========================================
+        MESAJLAR
+        ==========================================
+        */
 
         const messages = [
+
             "Hoşgeldin Neo...",
+
             "Ben de seni bekliyordum.",
+
             "Devam etmek için şifreyi girmelisin..."
+
         ];
 
 
-        let messageIndex = 0;
-        let characterIndex = 0;
+        /*
+        ==========================================
+        HTML ELEMANLARI
+        ==========================================
+        */
 
+        const text =
+            document.getElementById("text");
 
-        function typeMessage() {
+        const cursor =
+            document.getElementById("cursor");
 
-            const currentMessage = messages[messageIndex];
+        const passwordArea =
+            document.getElementById("passwordArea");
 
-
-            /* Mesaj tamamen yazılmadıysa */
-            if (characterIndex < currentMessage.length) {
-
-                text.textContent += currentMessage[characterIndex];
-
-                characterIndex++;
-
-                setTimeout(typeMessage, 120);
-
-            }
-
-
-            /* Mesaj tamamen yazıldı */
-            else {
-
-                /* Son mesajsa */
-                if (messageIndex === messages.length - 1) {
-
-                    setTimeout(() => {
-
-                        cursor.style.display = "inline-block";
-
-                        passwordArea.style.display = "block";
-
-                        password.focus();
-
-                    }, 300);
-
-                }
-
-
-                /* İlk veya ikinci mesajsa */
-                else {
-
-                    setTimeout(() => {
-
-                        deleteMessage();
-
-                    }, 3000);
-
-                }
-
-            }
-        }
-
-
-        function deleteMessage() {
-
-            if (characterIndex > 0) {
-
-                text.textContent =
-                    text.textContent.slice(0, -1);
-
-                characterIndex--;
-
-                setTimeout(deleteMessage, 45);
-
-            }
-
-            else {
-
-                messageIndex++;
-
-                setTimeout(typeMessage, 500);
-
-            }
-        }
-
-
-        /* Site açıldıktan sonra biraz bekle */
-        setTimeout(typeMessage, 1000);
+        const password =
+            document.getElementById("password");
 
 
         /*
-            Şimdilik test şifresi.
-            Daha sonra bunu defterde çözülen gerçek
-            şifreyle değiştireceğiz.
+        ==========================================
+        YAZI DURUMU
+        ==========================================
         */
 
-        password.addEventListener("keydown", function(event) {
+        let messageIndex = 0;
 
-            if (event.key === "Enter") {
+        let characterIndex = 0;
 
-                const enteredPassword = password.value;
 
-                if (enteredPassword === "37") {
 
-                    console.log("ACCESS GRANTED");
+        /*
+        ==========================================
+        YAZIYI KARAKTER KARAKTER YAZ
+        ==========================================
+        */
+
+        function typeMessage() {
+
+            const currentMessage =
+                messages[messageIndex];
+
+
+            /*
+            Mesajın tamamı henüz yazılmadıysa
+            */
+
+            if (
+                characterIndex <
+                currentMessage.length
+            ) {
+
+                text.textContent +=
+                    currentMessage.charAt(
+                        characterIndex
+                    );
+
+
+                characterIndex++;
+
+
+                /*
+                Yazma hızı
+                */
+
+                setTimeout(
+                    typeMessage,
+                    120
+                );
+
+            }
+
+
+            /*
+            Mesaj tamamen yazıldıysa
+            */
+
+            else {
+
+
+                /*
+                Son mesaj
+                */
+
+                if (
+                    messageIndex ===
+                    messages.length - 1
+                ) {
+
+                    /*
+                    İmleci göster
+                    */
+
+                    cursor.style.display =
+                        "inline-block";
+
+
+                    /*
+                    Şifre alanını aç
+                    */
+
+                    passwordArea.style.display =
+                        "block";
+
+
+                    /*
+                    Şifre kutusuna otomatik odaklan
+                    */
+
+                    password.focus();
 
                 }
 
+
+                /*
+                İlk iki mesaj
+                */
+
                 else {
 
-                    console.log("ACCESS DENIED");
+                    /*
+                    3 saniye bekle
+                    */
 
-                    password.value = "";
+                    setTimeout(
+                        deleteMessage,
+                        3000
+                    );
 
                 }
 
             }
 
-        });
+        }
+
+
+
+        /*
+        ==========================================
+        MESAJI BİR ANDA SİL
+        ==========================================
+        */
+
+        function deleteMessage() {
+
+            /*
+            Harf harf silmek yerine
+            tamamını bir anda kaldırıyoruz.
+            */
+
+            text.textContent = "";
+
+            characterIndex = 0;
+
+
+            /*
+            Sonraki mesaja geç
+            */
+
+            messageIndex++;
+
+
+            /*
+            Yeni mesajdan önce
+            kısa bir boşluk
+            */
+
+            setTimeout(
+                typeMessage,
+                500
+            );
+
+        }
+
+
+
+        /*
+        ==========================================
+        SAYFA AÇILINCA BAŞLA
+        ==========================================
+        */
+
+        setTimeout(
+            typeMessage,
+            1000
+        );
+
+
+
+        /*
+        ==========================================
+        ŞİFRE SİSTEMİ
+        ==========================================
+        */
+
+        password.addEventListener(
+            "keydown",
+            function(event) {
+
+
+                /*
+                Enter'a basıldı mı?
+                */
+
+                if (
+                    event.key === "Enter"
+                ) {
+
+
+                    /*
+                    Şimdilik test şifresi
+                    */
+
+                    const enteredPassword =
+                        password.value;
+
+
+                    if (
+                        enteredPassword ===
+                        "37"
+                    ) {
+
+                        console.log(
+                            "ACCESS GRANTED"
+                        );
+
+
+                    }
+
+                    else {
+
+                        console.log(
+                            "ACCESS DENIED"
+                        );
+
+
+                        /*
+                        Yanlış şifreyi temizle
+                        */
+
+                        password.value = "";
+
+                    }
+
+                }
+
+            }
+        );
 
     </script>
+
 
 </body>
 </html>
